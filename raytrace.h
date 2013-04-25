@@ -14,7 +14,9 @@
 
 #define EPSILON 0.0001
 
-#define RAYDEPTH 3
+#define RAYSHIFT 0.0002
+
+#define RAYDEPTH 5
 
 /* data structures */
 
@@ -66,6 +68,15 @@ typedef struct plane {
   material* m;
 } plane;
 
+typedef struct cube {
+  plane* p1;
+  plane* p2;
+  plane* p3;
+  plane* p4;
+  plane* p5;
+  plane* p6;
+} cube;
+
 typedef struct lighting {
   point* p; /* position */
   color* c; /* color */
@@ -89,6 +100,8 @@ int raySphereIntersect(ray*,sphere*,double*);
 void findSphereNormal(sphere*,point*,vector*);
 int rayPlaneIntersect(ray*, plane*, double*);
 plane* makePlane(GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
+cube* makeCube(GLfloat, GLfloat, GLfloat, GLfloat, material*);
+int rayCubeIntersect(ray*, cube*, double*, vector *);
 
 
 /* functions in light.cpp */

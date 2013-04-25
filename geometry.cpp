@@ -142,6 +142,7 @@ plane* makePlane(GLfloat x, GLfloat y, GLfloat z, GLfloat n_x, GLfloat n_y, GLfl
 
   return p;
 }
+
 int rayPlaneIntersect(ray* r, plane* p, double* t) {
   GLfloat dot = dotProduct(r->dir,p->n);
   if(dot == 0) {
@@ -153,14 +154,76 @@ int rayPlaneIntersect(ray* r, plane* p, double* t) {
     if(*t < 0) {
       return FALSE;
     }
+    point onray;
+    findPointOnRay(r,*t,&onray);
+    if( !(onray.x >= p->c->x - p->r && onray.x <= p->c->x + p->r&&
+          onray.y >= p->c->y - p->r && onray.y <= p->c->y + p->r && 
+          onray.z >= p->c->z - p->r && onray.z <= p->c->z + p->r ) ) {
+      return FALSE;
+    }
    // printf("t: %f\n", *t);
     freePoint(p1);
 
     return TRUE;
   }
 
- }
+}
 
+int rayCubeIntersect(ray *r, cube* c, double* t, vector* n) {
+  double min_t = 999999999999.9;
+  int hit = FALSE;
+  if(rayPlaneIntersect(r,c->p1,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p1->n,sizeof(vector));
+  }
+  if(rayPlaneIntersect(r,c->p2,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p2->n,sizeof(vector));
+  }
+  if(rayPlaneIntersect(r,c->p3,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p3->n,sizeof(vector));
+  }
+  if(rayPlaneIntersect(r,c->p4,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p4->n,sizeof(vector));
+  }
+  if(rayPlaneIntersect(r,c->p5,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p5->n,sizeof(vector));
+  }
+  if(rayPlaneIntersect(r,c->p6,t) && *t < min_t) {
+    hit = TRUE;
+    min_t = *t;
+    memcpy(n,c->p6->n,sizeof(vector));
+  }
+  *t = min_t;
+  return hit;
+}
+
+cube* makeCube(GLfloat x, GLfloat y, GLfloat z, GLfloat r, material* m) {
+  cube* c; 
+  c = (cube*)malloc(sizeof(cube));
+  c->p1 = makePlane(x-r,y,z,-1,0,0,r);
+  c->p1->m = m;
+  c->p2 = makePlane(x+r,y,z,1,0,0,r);
+  c->p2->m = m;
+  c->p3 = makePlane(x,y-r,z,0,-1,0,r);
+  c->p3->m = m;
+  c->p4 = makePlane(x,y+r,z,0,1,0,r);
+  c->p4->m = m;
+  c->p5 = makePlane(x,y,z-r,0,0,-1,r);
+  c->p5->m = m;
+  c->p6 = makePlane(x,y,z+r,0,0,1,r);
+  c->p6->m = m;
+
+  return c;
+}
 /* normal vector of s at p is returned in n */
 /* note: dividing by radius normalizes */
 void findSphereNormal(sphere* s, point* p, vector* n) {
